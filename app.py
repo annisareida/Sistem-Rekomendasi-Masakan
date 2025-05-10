@@ -2,17 +2,42 @@ import streamlit as st
 
 st.title("Sistem Rekomendasi Masakan 🍲")
 
-# Input + CF
+cf_map = {
+    "Sangat Tidak Yakin": 0.1,
+    "Tidak Yakin": 0.3,
+    "Mungkin": 0.5,
+    "Yakin": 0.7,
+    "Sangat Yakin": 0.9
+}
+
+# Konversi nilai CF ke tingkat verbal
+def verbal_cf(cf):
+    if cf < 0.2:
+        return "Sangat Tidak Yakin"
+    elif cf < 0.4:
+        return "Tidak Yakin"
+    elif cf < 0.6:
+        return "Mungkin"
+    elif cf < 0.8:
+        return "Yakin"
+    else:
+        return "Sangat Yakin"
+
+# Input pengguna
 bawang = st.selectbox("Apakah menggunakan Bawang?", ["Ya", "Tidak"])
-cf_bawang = st.slider("Seberapa yakin untuk pilihan Bawang?", 0.0, 1.0, 1.0)
+cf_bawang_verbal = st.selectbox("Seberapa yakin untuk pilihan Bawang?", list(cf_map.keys()))
+cf_bawang = cf_map[cf_bawang_verbal]
 
 santan = st.selectbox("Apakah menggunakan Santan?", ["Ya", "Tidak"])
-cf_santan = st.slider("Seberapa yakin untuk pilihan Santan?", 0.0, 1.0, 1.0)
+cf_santan_verbal = st.selectbox("Seberapa yakin untuk pilihan Santan?", list(cf_map.keys()))
+cf_santan = cf_map[cf_santan_verbal]
 
 cabai_merah = st.selectbox("Apakah menggunakan Cabai Merah?", ["Ya", "Tidak"])
-cf_cabai = st.slider("Seberapa yakin untuk pilihan Cabai Merah?", 0.0, 1.0, 1.0)
+cf_cabai_verbal = st.selectbox("Seberapa yakin untuk pilihan Cabai Merah?", list(cf_map.keys()))
+cf_cabai = cf_map[cf_cabai_verbal]
 
 bahan_utama = st.selectbox("Pilih Bahan Utama:", ["Ayam", "Daging Sapi", "Telur", "Ikan"])
+
 
 # Inferensi Tipe Masakan + CF
 tipe_masakan = None
@@ -65,10 +90,10 @@ elif tipe_masakan == "Tidak Lengkap":
     rekomendasi = "Tidak Lengkap"
     cf_rekomendasi = cf_tipe_masakan * 1.0
 
-# Output
+# Tampilkan hasil
 if st.button("Proses"):
     st.subheader("Hasil Inferensi")
-    st.write(f"**Tipe Masakan**: {tipe_masakan}")
-    st.write(f"**CF Tipe Masakan**: {cf_tipe_masakan:.2f}")
-    st.write(f"**Rekomendasi**: {rekomendasi}")
-    st.write(f"**CF Rekomendasi**: {cf_rekomendasi:.2f}")
+    st.write(f"**Tipe Masakan:** {tipe_masakan}")
+    st.write(f"**Tingkat Keyakinan Tipe Masakan:** {verbal_cf(cf_tipe_masakan)}")
+    st.write(f"**Rekomendasi:** {rekomendasi}")
+    st.write(f"**Tingkat Keyakinan Rekomendasi:** {verbal_cf(cf_rekomendasi)}")
